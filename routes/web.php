@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SocialAuthController;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +18,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/test', fn() => Inertia::render('Test'));
+
+Route::get('/login', fn() => view('auth.login'))->name('login');
+
+Route::post('/auth/social/callback', [SocialAuthController::class, 'handle'])->name('social.login');
