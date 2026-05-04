@@ -10,14 +10,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, Bell, User, Settings, LogOut } from "lucide-react";
 import Sidebar from "./Sidebar";
+import type { AppPageProps } from "@/types/page";
 
 interface NavbarProps {
     collapsed: boolean;
 }
 
 export default function Navbar({ collapsed }: NavbarProps) {
-    const { props } = usePage<{ auth: { user: any } }>();
-    const user = props.auth?.user;
+    const { props } = usePage();
+    const pageProps = props as AppPageProps;
+    const user = pageProps.auth?.user;
 
     const initials = user?.name
         ?.split(" ")
@@ -72,7 +74,7 @@ export default function Navbar({ collapsed }: NavbarProps) {
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="gap-2 px-2">
                         <Avatar className="h-8 w-8">
-                            <AvatarImage src={user?.avatar} />
+                            <AvatarImage src={user?.avatar ?? undefined} />
                             <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                                 {initials}
                             </AvatarFallback>

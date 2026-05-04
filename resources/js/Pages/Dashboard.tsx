@@ -2,6 +2,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, GraduationCap, BookOpen, CreditCard, ClipboardList, Award } from "lucide-react";
 import { usePage } from "@inertiajs/react";
+import type { AppPageProps } from "@/types/page";
 
 const adminStats = [
     { title: "Total Students", value: "1,234", icon: GraduationCap, change: "+12%" },
@@ -25,8 +26,9 @@ const studentStats = [
 ];
 
 export default function Dashboard() {
-    const { props } = usePage<{ auth: { user: any } }>();
-    const role = props.auth?.user?.role;
+    const { props } = usePage();
+    const pageProps = props as AppPageProps;
+    const role = pageProps.auth?.user?.role;
 
     const stats =
         role === "admin"   ? adminStats   :

@@ -7,6 +7,7 @@ import {
     LayoutDashboard, Users, GraduationCap, BookOpen, Calendar,
     ClipboardList, Award, CreditCard, Megaphone, Settings, ChevronLeft, School
 } from "lucide-react";
+import type { AppPageProps } from "@/types/page";
 
 interface NavItem {
     name: string;
@@ -132,8 +133,9 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
-    const { url, props } = usePage<{ auth: { user: any } }>();
-    const role: string = props.auth?.user?.role ?? "student";
+    const { url, props } = usePage();
+    const pageProps = props as AppPageProps;
+    const role: string = pageProps.auth?.user?.role ?? "student";
     const navigation = navigationMap[role] ?? studentNavigation;
 
     return (
