@@ -29,12 +29,18 @@ class SocialAuthController extends Controller
                 ]
             );
 
+            // Login and regenerate session
             Auth::login($user);
+            $request->session()->regenerate();
 
             return response()->json(['redirect' => '/dashboard']);
 
         } catch (\Throwable $e) {
-            return response()->json(['message' => 'Authentication failed: ' . $e->getMessage()], 401);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'file'    => basename($e->getFile()),
+                'line'    => $e->getLine(),
+            ], 401);
         }
     }
 }
