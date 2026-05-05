@@ -20,6 +20,8 @@ export default function Navbar({ collapsed }: NavbarProps) {
     const { props } = usePage();
     const pageProps = props as AppPageProps;
     const user = pageProps.auth?.user;
+    const notifications = pageProps.notifications?.items ?? [];
+    const unreadCount = pageProps.notifications?.unread_count ?? 0;
 
     const initials = user?.name
         ?.split(" ")
@@ -30,6 +32,28 @@ export default function Navbar({ collapsed }: NavbarProps) {
 
     function handleLogout() {
         router.post("/logout");
+    }
+
+    function markNotificationAsRead(notificationId: number, isRead: boolean) {
+        if (isRead) {
+            return;
+        }
+
+        router.post(`/notifications/${notificationId}/read`, {}, { preserveScroll: true });
+    }
+
+    function markAllNotificationsAsRead() {
+        router.post("/notifications/read-all", {}, { preserveScroll: true });
+    }
+
+    function formatNotificationDate(value?: string | null) {
+        if (!value) return "";
+        return new Date(value).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
     }
 
     return (
@@ -62,12 +86,62 @@ export default function Navbar({ collapsed }: NavbarProps) {
             </div>
 
             {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5" />
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                    3
-                </Badge>
-            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative">
+                        <Bell className="w-5 h-5" />
+                        {unreadCount > 0 && (
+                            <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 flex items-center justify-center text-xs">
+                                {unreadCount > 9 ? "9+" : unreadCount}
+                            </Badge>
+                        )}
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80">
+                    <DropdownMenuLabel className="flex items-center justify-between">
+                        <span>Notifications</span>
+                        {unreadCount > 0 && (
+                            <button
+                                type="button"
+                                className="text-xs text-primary hover:underline"
+                                onClick={markAllNotificationsAsRead}
+                            >
+                                Mark all read
+                            </button>
+                        )}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {notifications.length === 0 ? (
+                        <div className="px-3 py-6 text-sm text-muted-foreground text-center">
+                            No notifications yet.
+                        </div>
+                    ) : (
+                        notifications.map((notification) => (
+                            <DropdownMenuItem
+                                key={notification.id}
+                                className="items-start gap-2 py-3 cursor-pointer"
+                                onClick={() => markNotificationAsRead(notification.id, notification.is_read)}
+                            >
+                                {!notification.is_read && (
+                                    <span className="mt-1 h-2 w-2 rounded-full bg-primary shrink-0" />
+                                )}
+                                {notification.is_read && (
+                                    <span className="mt-1 h-2 w-2 rounded-full bg-muted shrink-0" />
+                                )}
+                                <div className="min-w-0">
+                                    <p className="text-sm font-medium truncate">{notification.title}</p>
+                                    <p className="text-xs text-muted-foreground line-clamp-2">
+                                        {notification.content}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground mt-1">
+                                        {formatNotificationDate(notification.published_at ?? notification.created_at)}
+                                    </p>
+                                </div>
+                            </DropdownMenuItem>
+                        ))
+                    )}
+                </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* User Menu */}
             <DropdownMenu>
@@ -91,10 +165,10 @@ export default function Navbar({ collapsed }: NavbarProps) {
                         <p className="text-xs text-muted-foreground font-normal">{user?.email}</p>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.visit("/profile")}>
                         <User className="w-4 h-4 mr-2" /> Profile
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.visit("/profile")}>
                         <Settings className="w-4 h-4 mr-2" /> Settings
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

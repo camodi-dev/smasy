@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     LayoutDashboard, Users, GraduationCap, BookOpen, Calendar,
-    ClipboardList, Award, CreditCard, Megaphone, Settings, ChevronLeft, School
+    ClipboardList, Award, CreditCard, Megaphone, Settings, ChevronLeft, School, Building2
 } from "lucide-react";
 import type { AppPageProps } from "@/types/page";
 
@@ -31,6 +31,8 @@ const adminNavigation: NavGroup[] = [
     {
         label: "Academic",
         items: [
+            { name: "Faculties", href: "/admin/faculties", icon: Building2 },
+            { name: "Departments", href: "/admin/departments", icon: Building2 },
             { name: "Students", href: "/admin/students", icon: GraduationCap },
             { name: "Teachers", href: "/admin/teachers", icon: Users },
             { name: "Courses", href: "/admin/courses", icon: BookOpen },
